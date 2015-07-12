@@ -106,18 +106,17 @@ const action_t table[5][4] =
 		}
 };
 
-action_t lookup(line_t current, state_t top)
+action_t lookup(line_t line_type, state_t block_state)
 {
-	return table[current][top];
+	return table[line_type][block_state];
 }
 
 int main(int argc, char **argv)
 {
 	stack_t *s;
 	line_t current_line_type;
-	state_t stack_line_type;
-	state_t stack_bottom;
-	action_t next_action;
+	state_t last_block_type;
+	state_t top_block_type;
 
 	stack_init(&s);
 	char line[1024];
@@ -128,20 +127,19 @@ int main(int argc, char **argv)
 	{
 
 		current_line_type = deduce_line_type(line);
-		stack_line_type = stack_top(s);
+		last_block_type = stack_top(s);
 
-		next_action = lookup(current_line_type, stack_line_type);
-		next_action(s);
+		lookup(current_line_type, last_block_type)(s);
 
-
+/*
 		if (current_line_type != L_OTHER)
 		{
 			stack_print(s);
 		}
+*/
 
-
-		stack_bottom = stack_first(s);
-		if ((stack_bottom == S_IF || stack_bottom == S_EMPTY)
+		top_block_type = stack_first(s);
+		if ((top_block_type == S_IF || top_block_type == S_EMPTY)
 				&& !(stack_size(s) == 1 && current_line_type == L_IF)
 				&& !(stack_size(s) == 0 && current_line_type == L_ENDIF))
 		{
